@@ -52,7 +52,7 @@ function f = fourier(n, t)
     x = (.2*exp(2.5)-.2)/2.5; % x_{0}(t) value
     while n < l+1 % Sums all x_{N}(t) values
         if n ~= 0
-            x = x + (.2*exp(2.5-1i*2*pi*200000*n*5*10^(-6)) - .2).*exp(1i.*2.*pi.*200000.*n.*t.*10^(-6))./(2.5-1i*2*pi*n*5*10^(-6)*200000);
+            x = x + (.2*exp(2.5-1i*2*pi*n) - .2).*exp(1i.*2.*pi.*200000.*n.*t.*10^(-6))./(2.5-1i*2*pi*n);
         end
         n = n + 1;
     end
