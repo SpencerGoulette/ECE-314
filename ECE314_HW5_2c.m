@@ -1,19 +1,37 @@
-%% Problem 2, part c
-k = 10; %DC gain
-w = 2 * pi * 10^6;  %Wn
-e = .3; % Epsilon
-pw = 1e-9; % Rectangular input pulse width (seconds)
-a = k*(w)^2;    % Gain values
+%% Simulink Demonstration Script
+% Provided by Hummels.
+%
+% This script (and the accompanying simulink model) illustrates how to run
+% a simulink model from a script, capture the output, and make a variety of
+% plots.
+
+%% Simulation Parameters
+% The simulink model is composed of a lowpass filter followed by a highpass
+% filter to model a (crumby) bandpass response.  The filter parameters and
+% the input pulse-width have been entered as "workspace variable".  I'm
+% defining them here, but I'll run the simulation later in the script using
+% a variety of values.
+k = 10;
+w = 2 * pi * 10^6;
+e = .3;
+pw = 1e-9;   % Rectangular input pulse width (seconds)
+a = k*(w)^2;
 b = 2*e*w;
 c = w^2;
-amp = a * 10^9; % Amplitude with a
-per = 1;    % Period
-offset = -.5*pw; % Offset
 
-%matlab "publish" include the simulation
+%% Simulation Model
+% Doing the open_system() call here is not really needed for the
+% script---but it does make the matlab "publish" include the simulation
+% block diagram in its output.  (For me, I have to close the model before
+% doing the publish command to force the inclusion of the diagram.)
 open_system('ECE314HW5_2c');
 
-%Simulate
+
+%% First Bogus Plot
+% Run the simulation, capture and plot the lowpass and bandpass outputs.
+% The "StartTime", "StopTime", and "MaxStep" parameters are specified here,
+% but are optional.  The parameters would otherwise default to the values
+% set in the simulink "Configuration Parameters" dialog box.
 simout = sim('ECE314HW5_2c',...
              'StartTime', '-1e-7',...
              'StopTime', '1e-5',...
@@ -21,83 +39,14 @@ simout = sim('ECE314HW5_2c',...
 yout = get(simout,'yout');  % Get the input time-series structure
 t = yout.Time;
 x = yout.Data;
-
 t2 = linspace(0, 10e-6, 51);
-h = (k*w/sqrt(1-e^2)).*exp(-e.*w.*t2).*sin(w.*sqrt(1-e^2).*t2); % h(t)
+h = 
 
 figure(1); clf;
-plot(t,x);  % Plots simulation
+plot(t,x);
 hold on;
-plot(t2,h,'o'); % Plots theoretical
-xlim([-.1e-6 10e-6])    % X axis range
-xlabel('Time (sec)');   % Labels
-ylabel('Impulse Response (Volts)');
-title('Problem 2, part c');
-grid on;
-
-%% Problem 2, part d
-
-figure(2); clf;
-i = 0;
-while i < 3 % Iterates through all wanted values of Epsilon
-    k = 10; %DC gain
-    w = 2 * pi * 10^6;  %Wn
-    e = 0.2+i*0.3; % Epsilon
-    pw = 2e-6;   % Rectangular input pulse width (seconds)
-    a = k*(w)^2;    % Gain values
-    b = 2*e*w;
-    c = w^2;
-    amp = a;    % Amplitude with a
-    per = 5e-6; % Period
-    offset = 1e-6;  % Offset
-    
-    %Simulate
-    simout = sim('ECE314HW5_2c',...
-                 'StartTime', '0',...
-                 'StopTime', '1e-5',...
-                 'MaxStep', '1e-9');
-    yout = get(simout,'yout');  % Get the input time-series structure
-    t = yout.Time;
-    x = yout.Data;
-
-    plot(t,x);  % Plots
-    hold on;
-    i = i + 1;  % Increments
-end
-
-xlim([0 10e-6]) % X axis range
-xlabel('Time (sec)');   % Labels
-ylabel('System Output (Volts)');
-title('Problem 2, part d');
-legend('E = 0.2','E = 0.5','E = 0.8')
-grid on;
-
-%% Problem 3, part b
-
-figure(3); clf;
-k = 10; %DC gain
-w = 2 * pi * 10^6;  %Wn
-e = 2;  % Epsilon
-pw = 2e-6; % Rectangular input pulse width (seconds)
-a = k*(w)^2;    % Gain values
-b = 2*e*w;
-c = w^2;
-amp = a;    % Amplitude with a
-per = 5e-6; % Period
-offset = 1e-6;  %Offset
-
-%Simulate
-simout = sim('ECE314HW5_2c',...
-             'StartTime', '0',...
-             'StopTime', '1e-5',...
-             'MaxStep', '1e-9');
-yout = get(simout,'yout'); % Get the input time-series structure
-t = yout.Time;
-x = yout.Data;
-
-plot(t,x);  % Plots
-xlim([0 1e-5])  % X axis range
-xlabel('Time (sec)'); % Labels
-ylabel('System Output (Volts)');
-title('Problem 3, part b');
+stem(h);
+xlabel('Time (msec)');
+ylabel('Voltage');
+title('Bandpass Output, 2 msec pulse at t=1 msec');
 grid on;
